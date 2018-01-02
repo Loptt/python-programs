@@ -6,7 +6,7 @@ class Employee:
 	raise_amount = 1.04
 
 	def __init__(self, first, last, pay):
-		self.first = first
+		self.firsst = first
 		self.last = last
 		self.pay = pay
 		self.email = first + '.' + last + '@company.com'
