@@ -1,37 +1,62 @@
-import socket
-from time import sleep
+import sockets
+import threading
 
-def welcome():
-	print("Welcome, please enter the adress of the connection you want to reach")
-
-	address = input("Address: ")
-	port = input("Port: ")
-
-	print("Connecting to "+address+":"+port+"...")
-
-	return (address, int(port))
-
-s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-
-server_address = welcome()
-
-try:
+class Client:
 	s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-	s.connect(server_address)
-except:
-	print("An error has ocurred")
-	sleep(2)
+	message = ""
+	server_address = 0
 
-while True:
-	serverMessage = s.recv(2048)
-	print(serverMessage.decode())
+	def welcome(self):
+		print("Welcome, please enter the adress of the connection you want to reach")
 
-	message = input("Message: ")
-	s.sendall(message.encode())
+		try:
+			address = input("Address: ")
+			port = input("Port: ")
+			print("Connecting to "+address+":"+port+"...")
 
-	if message=="quit":
-		break
+			return (address, int(port))
+		except:
+			return ("0.0.0.0",0)
 
-sleep(1)
+	def send_message(self):
 
-s.close()
+		while True:
+			self.message = input("Message: ")
+			self.s.sendall(self.message.encode())
+
+			if self.message=="quit":
+					break
+
+
+	def __init__(self):
+		self.server_address = self.welcome()
+
+	def connect(self):
+		try:
+			self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+			self.s.connect(self.server_address)
+		except:
+			print("An error has ocurred")
+			sleep(2)
+
+		thread = threading.Thread(target=self.send_message)
+		thread.daemon = True
+		thread.start()
+
+		while True:
+			server_message = self.s.recv(2048)
+
+			if not server_message:
+				break
+
+			print(server_message.decode())
+
+			if self.message=="quit":
+				break
+
+		s.close()
+
+
+client = Client()
+client.connect()
+

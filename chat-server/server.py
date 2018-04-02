@@ -1,41 +1,74 @@
 import socket
 import sys
-from _thread import *
+import threading
 
-host = ""
-port = 5000
-s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+class Server:
+	s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+	connections = []
 
-serverAdress = (host, port)
+	host = ""
+	port = 5000
+	server_address = (host, port)
 
-try:
-	s.bind(serverAdress)
+	def __init__(self):
+		try:
+			self.s.bind(self.server_address)
+			self.s.listen(5)
 
-except socket.error as e:
-	print(str(e))
+		except socket.error as e:
+			print(str(e))
 
-s.listen(5)
+	def handle_connection(self, conn, conn_address):
+		conn.send(str.encode("Welcome! Type your message\n"))
 
-print("Waiting for connections...")
+		while True:
 
-def threadedClient(conn):
-	conn.send(str.encode("Welcome! Type your message\n"))
+			data = conn.recv(1024)
+			reply = "Server says: " + data.decode()
 
-	while True:
-		data = conn.recv(2048)
-		reply = "Server output: " + data.decode()
+			if not data:
+				print(str(conn_address[0]) + ":" + str(conn_address[1]) + " dissconnected")
+				conn.close()
+				self.connections.remove(conn)
+				break
 
-		if not data:
-			break
+			for connection in self.connections:
+				connection.sendall(str.encode(reply))
 
-		conn.sendall(str.encode(reply))
+	def send_message(self):
 
-	conn.close()
+		while True:
 
-while True:
+			print("Input message to clients:")
 
-	conn, address = s.accept()
-	print("Connected to: "+address[0]+":"+str(address[1]))
+			try:
+				message = ("Server says: " + input()).encode()
+			except:
+				print("Data input error")
 
-	start_new_thread(threadedClient, (conn,))
+			for connection in self.connections:
+				connection.sendall(message)
+
+
+	def run(self):
+		print("Initializing server...")
+		print("Waiting for connections...\n")
+
+		thread = threading.Thread(target=self.send_message)
+		thread.daemon = True
+		thread.start()
+
+		while True:
+			conn, conn_address = self.s.accept()
+			thread = threading.Thread(target=self.handle_connection, args=(conn,conn_address))
+			thread.daemon = True
+			thread.start()
+
+			self.connections.append(conn)
+
+			print(str(conn_address[0]) + ":" + str(conn_address[1]) + " connected")
+
+#START
+server = Server()
+server.run()
 
