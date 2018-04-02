@@ -36,8 +36,7 @@ class Client:
 			self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 			self.s.connect(self.server_address)
 		except:
-			print("An error has ocurred")
-			sleep(2)
+			print("An error has ocurred")	
 
 		thread = threading.Thread(target=self.send_message)
 		thread.daemon = True
@@ -54,7 +53,7 @@ class Client:
 			if self.message=="quit":
 				break
 
-		s.close()
+		self.s.close()
 
 
 client = Client()

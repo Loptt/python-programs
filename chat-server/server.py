@@ -23,8 +23,9 @@ class Server:
 
 		while True:
 
-			data = conn.recv(1024)
-			reply = "Server says: " + data.decode()
+			data = conn.recv(1024)   
+			reply = str(conn_address[0]) + ":" + str(conn_address[1]) + " says: " + data.decode()
+			print(reply)
 
 			if not data:
 				print(str(conn_address[0]) + ":" + str(conn_address[1]) + " dissconnected")
