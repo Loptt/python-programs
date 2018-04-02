@@ -1,4 +1,4 @@
-import sockets
+import socket
 import threading
 
 class Client:
