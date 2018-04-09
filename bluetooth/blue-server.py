@@ -3,7 +3,7 @@ import threading
 
 class Server:
 
-	s = socket.socket(socket.AF_BLUETOOTH, socket.SOCKSTREAM, socket.BTPROTO_RFCOMM)
+	s = socket.socket(socket.AF_BLUETOOTH, socket.SOCK_STREAM, socket.BTPROTO_RFCOMM)
 
 	#Server unique MAC address
 	server_address = "ec:35:86:2e:b9:1c"
@@ -15,7 +15,7 @@ class Server:
 	def __init__(self):
 
 		try:
-			self.s.bind((server_address, port))
+			self.s.bind((self.server_address, self.port))
 			self.s.listen(5)
 
 		except socket.error as e:
